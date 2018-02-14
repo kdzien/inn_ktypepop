@@ -1,0 +1,24 @@
+
+<Loop sql="select distinct tcn.manu_name as marka from system_dopasowan.krosy kr left join tecdoc_v4.tecdoc_cars_new tcn on kr.`g-numer` = tcn.car_id and tcn.profil_id = [[profil_id]] where kr.sku = '[[sku]]' and tcn.manu_name != 'VAUXHALL' order by case when tcn.manu_name = '[[marka]]' then 1 else 2 end, marka;" alias="TableMarka">
+  <tr><td class="car_mark" colspan="9">[[TableMarka.marka]]</td></tr>
+  <tr>
+    <th class="td1">Modèle</th>
+    <th class="td2">Type de carrosserie</th>
+    <th class="td3">Années de construction</th>
+    <th class="td4">kW</th>
+    <th class="td5">HP</th>
+    <th class="td6">cm<sup>3</sup></th>
+    <th class="td8">Autres</th>
+  </tr>
+<Loop sql="SELECT kr.`g-numer` as car_id,ifnull(tc.general_model, tc.model_full_name) as model, tc.car_name as wersja,  case when tc.construction_type in ('Dumptruck','Bus','Décapotable', 'Break', 'Coupé', 'Autobus/Autocar', 'Pick-up', 'Camionnette', 'Camion plate-forme/Châssis', 'Camionnette/break','Platform/Chassis','Box')  then tc.construction_type when tc.construction_type in ('Véhicule tout terrain à carrosserie ouverte', 'Evolution spéciale', 'Véhicule tout terrain à carrosserie fermée') then '&nbsp;' when tc.construction_type is null then '&nbsp;' when tc.construction_type = 'A trois volumes' then 'Berline 4 portes' when tc.construction_type = '3/5 portes' then 'Berline 3/5 portes' else tc.construction_type end as nadwozie, tc.power_kw as mockw, tc.power_hp as mochp, tc.cylinder_capacity_ccm as pojemnosc, tc.motor_code as kodsilnika, zp.Rokod dataod,zp.Rokdo datado FROM system_dopasowan.krosy kr join tecdoc_v3.tecdoc_cars_new tc on kr.`G-NUMER`=tc.car_id join ebay_api_calls.active_auction aa on kr.sku=aa.sku join ee_dywany_anty_mateusz.zgodne_prod zp on ExtractValue(lower(aa.applicationdata),'//zgodny_id')=zp.ID and tc.manu_name like concat('%',zp.marka,'%') where kr.sku='[[sku]]' and tc.profil_id=[[profil_id]] and tc.manu_name='[[TableMarka.marka]]' group by kr.`g-numer` order by tc.model_full_name, tc.car_name" alias="TableModel">
+  <tr>
+    <td class="td1"><b>[[TableModel.model]]</b> [[TableModel.wersja]]</td>
+    <td class="td2">[[TableModel.nadwozie]]</td>
+    <td class="td3">[[TableModel.dataod]] - [[TableModel.datado]]</td>
+    <td class="td4">[[TableModel.mockw]]</td>
+    <td class="td5">[[TableModel.mochp]]</td>
+    <td class="td6">[[TableModel.pojemnosc]]</td>
+    <td class="td8">[[TableModel.kodsilnika]]</td>
+  </tr>
+  </Loop>
+</Loop>

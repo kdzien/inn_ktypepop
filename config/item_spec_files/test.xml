@@ -1,0 +1,57 @@
+<ItemSpecifics>
+<Loop sql="SELECT Nadwozie FROM ee_owiewki_mateusz.aukcja_view WHERE profil_id = [[profil_id]] AND Produkt_ID = [[produkt_id]] AND Zgodny_ID = [[zgodny_id]] AND Nadwozie IS NOT NULL" alias="product_fit">
+<NameValueList>
+    <Name>Product Fitting Note</Name>
+    <Value>[[product_fit.Nadwozie]]</Value>    
+</NameValueList>
+</Loop>   
+  <NameValueList>
+    <Name>Type</Name>
+    <Value>Body Parts</Value>
+  </NameValueList>
+  <NameValueList>
+    <Name>Subtype</Name>
+    <Value>Wind Deflectors</Value>
+  </NameValueList>
+  <NameValueList>
+    <Name>Product Name</Name>
+    <Value>Door Wind Deflectors</Value>
+  </NameValueList>
+  <NameValueList>
+    <Name>Colour</Name>
+    <Value>Dark tinted</Value>
+  </NameValueList>
+  <NameValueList>
+    <Name>Model</Name>
+    <Value>[[model]]</Value>
+  </NameValueList>
+ 
+<NameValueList>
+    <Name>Number of doors</Name>
+    <Value>[[wersja]]</Value>
+</NameValueList>
+<NameValueList>
+    <Name>Shape</Name>
+    <Value>[[nadwozie]]</Value>
+</NameValueList>
+<NameValueList>
+    <Name>Number of deflectors</Name>
+    <Value><![CDATA[[[ilosc_owiewek]]]]></Value>
+</NameValueList>
+<NameValueList>   
+ <Name>Brand</Name>
+    <Value>TEAM HEKO</Value> 
+</NameValueList><Loop sql="select s.sku, COALESCE(e.ean, 'Does Not Apply') as ean, COALESCE(replace(e.ean,'590',''), 'Does Not Apply') as mpn, COALESCE(substring(replace(e.ean,'5905',''),1,8), 'Does Not Apply') as ManufacturerPartNr from (select '[[sku]]' as sku) as s left join ee_owiewki_mateusz.kody_ean e on s.sku=concat('H',e.art_id,'00');" alias="ean">
+  <NameValueList>
+    <Name>MPN</Name>
+    <Value>[[ean.mpn]]</Value>
+  </NameValueList>
+  <NameValueList>
+    <Name>EAN</Name>
+    <Value>[[ean.ean]]</Value>   
+  </NameValueList>
+    <NameValueList>
+    <Name>Manufacturer Part Number</Name>
+    <Value>[[ean.ManufacturerPartNr]]</Value>   
+  </NameValueList></Loop>
+</ItemSpecifics>

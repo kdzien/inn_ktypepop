@@ -1,0 +1,34 @@
+<ItemSpecifics>
+<Loop sql="select s.sku, COALESCE(e.ean, 'Non applicable') as ean from (select '[[sku]]M' as sku) as s left join ee_dywany_anty_mateusz.kody_ean e on s.sku=concat('R',e.art_id);" alias="ean"><NameValueList>
+    <Name>EAN</Name>
+    <Value>[[ean.ean]]</Value>   
+  </NameValueList></Loop>  
+  <NameValueList>
+    <Name>État</Name>
+    <Value>Neuf avec étiquette</Value>
+  </NameValueList>
+  <NameValueList>
+    <Name>Marque</Name>
+    <Value>REZAW-PLAST</Value>
+  </NameValueList>
+  <NameValueList>
+    <Name>Marque du véhicule</Name>
+    <Value>[[marka]]</Value>
+  </NameValueList>
+  <NameValueList>
+    <Name>Modèle</Name>
+    <Value>[[model]]</Value>
+  </NameValueList>       
+  <NameValueList>   
+    <Name>décoration d'intérieurs</Name>    
+    <Value>Doublure de caisse</Value>       
+  </NameValueList>
+  <NameValueList>   
+    <Name>Particularité</Name>
+    <Value>Avec surface anti-dérapante</Value> 
+  </NameValueList>
+  <NameValueList>   
+    <Name>Numéro de pièce fabricant</Name>
+    <Value>Non applicable</Value> 
+  </NameValueList>
+</ItemSpecifics> 

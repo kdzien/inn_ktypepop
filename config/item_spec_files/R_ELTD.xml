@@ -1,0 +1,46 @@
+<ItemSpecifics>
+  <NameValueList>
+    <Name>State</Name>
+    <Value>New with tag</Value>
+  </NameValueList>
+  <NameValueList>
+    <Name>Manufacturer</Name>
+    <Value>[[marka]]</Value>
+  </NameValueList>
+  <NameValueList>
+    <Name>Model</Name>
+    <Value>[[model]]</Value>
+  </NameValueList>    
+  <NameValueList>   
+    <Name>Interior decoration</Name>    
+    <Value>Bedliner</Value>       
+  </NameValueList>
+  <NameValueList>   
+    <Name>Particularity</Name>
+    <Value>With anti-slip surface</Value> 
+  </NameValueList>
+  <NameValueList>   
+    <Name>Carpet/Floor Mat Type</Name>
+    <Value>Boot Liner</Value> 
+  </NameValueList> 
+  <NameValueList>   
+    <Name>Colour</Name>
+    <Value>Black</Value> 
+  </NameValueList>
+  <NameValueList>   
+    <Name>Brand</Name>
+    <Value>REZAW-PLAST</Value> 
+  </NameValueList><Loop sql="select s.sku, COALESCE(e.ean, 'nicht zutreffend') as ean, COALESCE(replace(e.ean,'590',''), 'nicht zutreffend') as mpn, COALESCE(substring(replace(ean,'5905',''),1,8), 'Does Not Apply') as ManufacturerPartNr from (select '[[sku]]M' as sku) as s left join ee_dywany_anty_mateusz.kody_ean e on s.sku=concat('R',e.art_id);" alias="ean">
+  <NameValueList>
+    <Name>MPN</Name>
+    <Value>[[ean.mpn]]</Value>
+  </NameValueList>
+  <NameValueList>
+    <Name>EAN</Name>
+    <Value>[[ean.ean]]</Value>   
+  </NameValueList>
+    <NameValueList>
+    <Name>Manufacturer Part Number</Name>
+    <Value>[[ean.ManufacturerPartNr]]</Value>   
+  </NameValueList></Loop>
+</ItemSpecifics>

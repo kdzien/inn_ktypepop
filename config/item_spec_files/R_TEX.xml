@@ -1,0 +1,44 @@
+<ItemSpecifics>
+  <NameValueList>
+    <Name>Zustand</Name>
+    <Value>Neu mit Etikett</Value>
+  </NameValueList>
+  <NameValueList>
+    <Name>Fahrzeugmarke</Name>
+    <Value>[[marka]]</Value>
+  </NameValueList>
+  <NameValueList>
+    <Name>Modell</Name>
+    <Value>[[model]]</Value>
+  </NameValueList>
+  <NameValueList>   
+    <Name>Referenznummer(n) OE</Name>   
+    <Value>Anti-Rutsch</Value>
+    <Value>Wanne</Value>
+    <Value>Kofferraumwanne</Value>
+    <Value>Laderaumwanne</Value>
+    <Value>Passform</Value>
+    <Value>Kofferraumschale</Value>
+    <Value>Kofferraumschutz</Value>
+  </NameValueList>
+  <NameValueList>   
+    <Name>Innenausstattung</Name>    
+    <Value>Laderaumwanne</Value>       
+  </NameValueList>
+  <NameValueList>   
+    <Name>Besonderheit</Name>
+    <Value>Mit Anti-Rutsch Fläche</Value> 
+  </NameValueList>
+  <NameValueList>   
+    <Name>Hersteller</Name>
+    <Value>REZAW-PLAST</Value> 
+  </NameValueList><Loop sql="select s.sku, COALESCE(e.ean, 'nicht zutreffend') as ean, COALESCE(replace(e.ean,'590',''), 'nicht zutreffend') as mpn from (select '[[sku]]M' as sku) as s left join ee_dywany_anty_mateusz.kody_ean e on s.sku=concat('R',e.art_id);" alias="ean">
+  <NameValueList>
+    <Name>Herstellernummer</Name>
+    <Value>[[ean.mpn]]</Value>
+  </NameValueList>
+  <NameValueList>
+    <Name>EAN</Name>
+    <Value>[[ean.ean]]</Value>   
+  </NameValueList></Loop>
+</ItemSpecifics> 
