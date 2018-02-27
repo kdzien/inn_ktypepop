@@ -1,0 +1,25 @@
+{
+  "name": "inn_ktypepop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kdzien/inn_ktypepop.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kdzien/inn_ktypepop/issues"
+  },
+  "homepage": "https://github.com/kdzien/inn_ktypepop#readme",
+  "dependencies": {
+    "jsontoxml": "^1.0.0",
+    "mysql": "^2.15.0",
+    "replace-async": "^1.1.1",
+    "xml-js": "^1.6.2"
+  }
+}

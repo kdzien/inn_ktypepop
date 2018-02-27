@@ -1,14 +1,9 @@
+"use strict";
 var db = require("./db_connection")
-var Elem_auction_id = require("./config/item_id/Element.js")
-var Elem_app_data = require("./config/item_app_data/Element.js")
-var Elem_compability = require("./config/item_compability_list/Element.js")
-var Elem_title = require("./config/item_title/Element.js")
-var Elem_is = require("./config/jsonLoopPareser.js")
-var Elem_desc = require("./config/item_description/Element.js")
-
-// jsonparsed("./config/item_spec_files/R_ELTD.xml",itemSpecXML=>{
-// console.log(itemSpecXML)
-// })
+var Elem_auction_id = require("./config/item_id/ID.js")
+var Elem_title = require("./config/item_title/Title.js")
+var is = require("./config/jsonLoopPareser.js")
+var desc = require("./bracketParser/setMap.js")
 
 var single_item = {
     ItemID:"",
@@ -18,37 +13,40 @@ var single_item = {
     item_title:"",
     item_desc:""
 }
+
 var item_array = new Array();
 
-db.query('select * from konradd.ktype_widok',function(err,result){
+const prod = 'owiewkiH';
+
+let db_query = `select * from konradd.ktype_widok_${prod}  where sku in (
+    SELECT sku FROM ee_all.ktype_editor_log 
+    where job_timestamp is null
+    and scope!='infopics' order by sku
+    )`;
+
+db.query(db_query,function(err,result){
     var n = 0;
-    (function asyc(){
+        (function asyc(){
+        let evq=`select * from konradd.ktype_widok_${prod} where profil_id=${result[n].profil_id} and zgodny_id=${result[n].zgodny_id} and produkt_id = ${result[n].produkt_id} and user_id='${result[n].user_id}' `
+        let etq=`select content from ${getCorrectDBProduct(prod)} where user='${result[n].user_id}' and profil=${result[n].profil_id} and kind='xmld' and name =`
         if(n<=result.length-1){
-            //id aukcji
             var auction_id = new Elem_auction_id(result[n].auction_id)
             single_item.ItemID = auction_id.toString()
-            //app data
-            var app_data = new Elem_app_data(result[n].ApplicationData)
-            app_data.getEncoded((appdata)=>{
-                single_item.app_data = appdata;
-                var title = new Elem_title(result[n].title)
+                is.getItemDesc(etq+`'encoded_app_data'`,evq,isx=>{
+                single_item.app_data = isx;
+                var title = new Elem_title(result[n].tytul)
                 single_item.item_title = title.toString()
-                var comp_list = new Elem_compability(result[n].RokOd,result[n].RokDo,result[n].sku,result[n].country)
-                comp_list.toString((res)=>{
-                    single_item.compability_list=res;
-                    var its = new Elem_is(result[n].model,result[n].marka,result[n].typ,result[n].sku,result[n].profil_id,result[n].produkt_id,result[n].zgodny_id,result[n].rokrokdobetter,result[n].rokod,result[n].rokdo)
-                    its.setMap()
-                    its.getParsed(getCorectXML(result[n].user_id),isx=>{
-                        single_item.item_specific = isx;
-                        var it_desc = new Elem_desc(result[n].user_id,result[n].profil_id,result[n].encoded_art_id,result[n].encoded_sku,result[n].ftpfolder,result[n].link,result[n].title,result[n].link_de,result[n].marka,result[n].model)
-                            it_desc.toString((desc)=>{
-                            single_item.item_desc=desc.replace(/(\r\n|\n|\r)/gm,"").replace(/'/g, "\\'");;
+                is.getItemDesc(etq+`'ItemCompatibilityList_replace'`,evq,isx=>{
+                    single_item.compability_list=isx;
+                    is.getItemDesc(etq+`'ItemSpecifics'`,evq,(isx)=>{
+                        single_item.item_specific=isx
+                        is.getItemDesc('select html_template from '+getCorrectHTMLTEMPLATE(prod)+'.`db_config_'+result[n].user_id+'`'+' where profil_id = '+result[n].profil_id,evq,(rdesc)=>{
+                            single_item.item_desc=rdesc.replace(/(\r\n|\n|\r)/gm,"").replace(/'/g, "\\'");;
                             item_array.push(single_item)
                             single_item = {}
                             n++
                             asyc()
                         })
-                        
                     })
                 })
             })
@@ -58,33 +56,62 @@ db.query('select * from konradd.ktype_widok',function(err,result){
     })()
 
 })
-
-function getCorectXML(user_id){
-    var url = new String()
-    switch (user_id) {
-        case 'online-depot-ohg':
-            url="./config/item_spec_files/R_ODDE.xml"
+function getCorrectDBProduct(product){
+    let db_name = ""
+    switch(product){
+        case "dywanyR":
+            db_name="ee_dywany_anty_mateusz.db_templates";
             break;
-        case 'eternal-store':
-            url="./config/item_spec_files/R_ES.xml"
+        case "dywanyG":
+            db_name="ee_dywany_gumowe_mateusz.db_templates";
             break;
-        case 'grenico-ohg':
-            url="./config/item_spec_files/R_GROHG.xml"
+        case "dywanyW":
+            db_name="ee_dywany_gumowe_mateusz.db_templates";
             break;
-        case 'eternalcar-ltd':
-            url="./config/item_spec_files/R_ELTD.xml"
+        case "dywanyS":
+            db_name="ee_dywany_gumowe_mateusz.db_templates";
             break;
-        case 'trade-express-ug':
-            url="./config/item_spec_files/R_TEX.xml"
+        case "dywanyGR":
+            db_name="ee_dywany_gumowe_mateusz.db_templates";
             break;
-        case 'grenico-fr':
-            url="./config/item_spec_files/R_GRFR.xml"
+        case "owiewkiH":
+            db_name="ee_owiewki_mateusz.db_templates";
             break;
         default:
-         url="./config/item_spec_files/R_GRFR.xml"   
             break;
     }
-    return url;
+    return db_name
+}
+function getCorrectHTMLTEMPLATE(product){
+    let db_name = ""
+    switch(product){
+        case "dywanyR":
+            db_name="ee_dywany_anty_mateusz";
+            break;
+        case "dywanyG":
+            db_name="ee_dywany_gumowe_mateusz";
+            break;
+        case "dywanyW":
+            db_name="ee_dywany_gumowe_mateusz";
+            break;
+        case "dywanyS":
+            db_name="ee_dywany_gumowe_mateusz";
+            break;
+        case "dywanyGR":
+            db_name="ee_dywany_gumowe_mateusz";
+            break;
+        case "owiewkiH":
+            db_name="ee_owiewki_mateusz";
+            break;
+        default:
+            break;
+    }
+    return db_name
+}
+
+function getCorectXML(user_id,profil_id,product){
+    let db_name = getCorrectDBProduct(product)
+    return `select content from ${db_name} where user='${user_id}' and profil=${profil_id} and kind='xmld' and name ='ItemSpecifics'`
 }   
 
 function postData(array){
@@ -96,7 +123,6 @@ function postData(array){
         (function asyc2(){
             if(n<=array.length-1){
                 valuesx+=`("${array[n].ItemID}","${array[n].item_specific}","${array[n].compability_list}","${array[n].app_data}","${array[n].item_title}",'${array[n].item_desc}'), `
-                // valuesx+=`("xd","xd","xd","xd"), `
                 n++
                 asyc2()
             }else{
@@ -109,6 +135,4 @@ function postData(array){
             }
         })()
     })
-
 }
-
