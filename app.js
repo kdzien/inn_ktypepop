@@ -18,18 +18,17 @@ var item_array = new Array();
 
 const prod = 'owiewkiH';
 
-let db_query = `select * from konradd.ktype_widok_${prod}  where sku in (
-    SELECT sku FROM ee_all.ktype_editor_log 
-    where job_timestamp is null
-    and scope!='infopics' order by sku
-    )`;
-
+let db_query = `select * from konradd.ktype_widok_${prod}`;
+    
 db.query(db_query,function(err,result){
+    
+    if(err){
+    }
     var n = 0;
         (function asyc(){
-        let evq=`select * from konradd.ktype_widok_${prod} where profil_id=${result[n].profil_id} and zgodny_id=${result[n].zgodny_id} and produkt_id = ${result[n].produkt_id} and user_id='${result[n].user_id}' `
-        let etq=`select content from ${getCorrectDBProduct(prod)} where user='${result[n].user_id}' and profil=${result[n].profil_id} and kind='xmld' and name =`
         if(n<=result.length-1){
+            let evq=`select * from konradd.ktype_widok_${prod} where profil_id=${result[n].profil_id} and zgodny_id=${result[n].zgodny_id} and produkt_id = ${result[n].produkt_id} and user_id='${result[n].user_id}' `
+            let etq=`select content from ${getCorrectDBProduct(prod)} where user='${result[n].user_id}' and profil=${result[n].profil_id} and kind='xmld' and name =`
             var auction_id = new Elem_auction_id(result[n].auction_id)
             single_item.ItemID = auction_id.toString()
                 is.getItemDesc(etq+`'encoded_app_data'`,evq,isx=>{
@@ -45,6 +44,7 @@ db.query(db_query,function(err,result){
                             item_array.push(single_item)
                             single_item = {}
                             n++
+                            console.log("xd")
                             asyc()
                         })
                     })
@@ -66,13 +66,13 @@ function getCorrectDBProduct(product){
             db_name="ee_dywany_gumowe_mateusz.db_templates";
             break;
         case "dywanyW":
-            db_name="ee_dywany_gumowe_mateusz.db_templates";
+            db_name="ee_dywany_bez_maty_mateusz.db_templates";
             break;
         case "dywanyS":
-            db_name="ee_dywany_gumowe_mateusz.db_templates";
+            db_name="ee_bagaznikowe_gumowe.db_templates";
             break;
         case "dywanyGR":
-            db_name="ee_dywany_gumowe_mateusz.db_templates";
+            db_name="ee_komplety_dywany.db_templates";
             break;
         case "owiewkiH":
             db_name="ee_owiewki_mateusz.db_templates";
@@ -92,13 +92,13 @@ function getCorrectHTMLTEMPLATE(product){
             db_name="ee_dywany_gumowe_mateusz";
             break;
         case "dywanyW":
-            db_name="ee_dywany_gumowe_mateusz";
+            db_name="ee_dywany_bez_maty_mateusz";
             break;
         case "dywanyS":
-            db_name="ee_dywany_gumowe_mateusz";
+            db_name="ee_bagaznikowe_gumowe";
             break;
         case "dywanyGR":
-            db_name="ee_dywany_gumowe_mateusz";
+            db_name="ee_komplety_dywany";
             break;
         case "owiewkiH":
             db_name="ee_owiewki_mateusz";
@@ -123,6 +123,7 @@ function postData(array){
         (function asyc2(){
             if(n<=array.length-1){
                 valuesx+=`("${array[n].ItemID}","${array[n].item_specific}","${array[n].compability_list}","${array[n].app_data}","${array[n].item_title}",'${array[n].item_desc}'), `
+                console.log(array[n].ItemID+" "+array[n].app_data)
                 n++
                 asyc2()
             }else{

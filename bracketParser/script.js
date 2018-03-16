@@ -8,10 +8,10 @@ function parseData(query,callback){
         let html = result[0].html_template || result[0].content
         var start,end;
         for(let x =0; x<=html.length-1;x++){
-            if(checkOpenBracket(html[x]) && checkOpenBracket(html[x+1]) && !checkOpenBracket(html[x+2]) ){
+            if(!checkOpenBracket(html[x-1]) && checkOpenBracket(html[x]) && checkOpenBracket(html[x+1]) && !checkOpenBracket(html[x+2]) ){
                 start = x
             }
-            else if(!checkCloseBracket(html[x-1]) && checkCloseBracket(html[x]) && checkCloseBracket(html[x+1])){
+            else if(!checkCloseBracket(html[x-1]) && checkCloseBracket(html[x]) && checkCloseBracket(html[x+1]) && !checkCloseBracket(html[x+2]) ){
                 end = x+2
                 bracket_array.push(html.slice(start,end))
             }

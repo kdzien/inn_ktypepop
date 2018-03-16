@@ -88,11 +88,9 @@ function generateContent(loopObj,callback){
 function resolveLoopContent(looop,cb){
     var loop = looop.loop
     var obj = {sql:"",alias:"",body:""}
-    var sqlstring = loop.substring(loop.lastIndexOf('sql="')+5,loop.lastIndexOf('"'));
-    obj.sql= sqlstring.substring(0,sqlstring.indexOf('"'))
-    obj.alias = loop.substring(loop.lastIndexOf('alias="')+7,loop.lastIndexOf('"'));
-    obj.body = loop.substring(loop.indexOf('>')+1,loop.lastIndexOf('</Loop>'));
+    obj.sql = loop.substring(loop.lastIndexOf('sql="')+5,loop.indexOf('"',loop.lastIndexOf('sql="')+5));
+    obj.alias = loop.substring(loop.lastIndexOf('alias="')+7,loop.indexOf('"',loop.lastIndexOf('alias="')+7));
+    obj.body = loop.substring(loop.indexOf('>')+1,loop.indexOf('</Loop>',loop.indexOf('>')+1));
     cb(obj)
 }
-
 module.exports.parse=parse;

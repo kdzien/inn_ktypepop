@@ -16,7 +16,6 @@ function parseData(urlx,callback) {
 }
 
 function getItemDesc (tq,vq,callback){
-    console.log(tq)
     parseData(tq,(res)=>{
         brackets.getDescription(vq,tq,(res)=>{
             loop_parser.parse(res,itemdesc=>{
