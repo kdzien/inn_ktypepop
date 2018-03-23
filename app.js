@@ -16,13 +16,15 @@ var single_item = {
 
 var item_array = new Array();
 
-const prod = 'owiewkiH';
+const prod = 'dywanyG';
 
-let db_query = `select * from konradd.ktype_widok_${prod}`;
+let db_query = `select * from konradd.ktype_widok_${prod}` ;
+    console.log(db_query)
     
 db.query(db_query,function(err,result){
     
     if(err){
+        console.log(err)
     }
     var n = 0;
         (function asyc(){
@@ -43,8 +45,8 @@ db.query(db_query,function(err,result){
                             single_item.item_desc=rdesc.replace(/(\r\n|\n|\r)/gm,"").replace(/'/g, "\\'");;
                             item_array.push(single_item)
                             single_item = {}
+                            console.log(result[n].auction_id)
                             n++
-                            console.log("xd")
                             asyc()
                         })
                     })
