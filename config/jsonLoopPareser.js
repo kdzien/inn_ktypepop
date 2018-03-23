@@ -5,7 +5,7 @@ var convert = require('xml-js');
 const replace = require('replace-async');
 var jsonxml = require('jsontoxml');
 var brackets = require("../bracketParser/setMap.js")
-var loop_parser = require("../loop_parser/script.js")
+var loop_parser = require("../../loop_solver/script.js")
 
 
 function parseData(urlx,callback) {
@@ -18,8 +18,8 @@ function parseData(urlx,callback) {
 function getItemDesc (tq,vq,callback){
     parseData(tq,(res)=>{
         brackets.getDescription(vq,tq,(res)=>{
-            loop_parser.parse(res,itemdesc=>{
-                callback(itemdesc)
+            loop_parser.solve(res,db).then(result=>{
+                callback(result)
             })
         })
     })

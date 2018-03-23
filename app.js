@@ -16,7 +16,7 @@ var single_item = {
 
 var item_array = new Array();
 
-const prod = 'dywanyG';
+const prod = 'owiewkiH';
 
 let db_query = `select * from konradd.ktype_widok_${prod}` ;
     console.log(db_query)
