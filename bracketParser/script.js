@@ -1,42 +1,48 @@
 
 "use strict";
+const brackets = require('./resolveBrackets.js')
 const db = require('../db_connection.js')
+const replace = require('replace-async');
 
-function parseData(query,callback){
-    const bracket_array = new Array();
-    db.query(query,function(err,result){
-        let html = result[0].html_template || result[0].content
-        var start,end;
-        for(let x =0; x<=html.length-1;x++){
-            if(!checkOpenBracket(html[x-1]) && checkOpenBracket(html[x]) && checkOpenBracket(html[x+1]) && !checkOpenBracket(html[x+2]) ){
-                start = x
-            }
-            else if(!checkCloseBracket(html[x-1]) && checkCloseBracket(html[x]) && checkCloseBracket(html[x+1]) && !checkCloseBracket(html[x+2]) ){
-                end = x+2
-                bracket_array.push(html.slice(start,end))
-            }
-            else if(html.length-1===x){
-                callback(bracket_array,html)
-            }
-        }
+function getDescription (view_query,template_query,callback){
+    brackets.getBrackets(template_query,(bracketArray,html)=>{
+        db.query(view_query,(err,result,fieldss)=>{
+            let fields = [];
+            let change_map = []
+            fieldss.forEach(elem=>{
+                fields.push('[['+elem.name+']]');
+                change_map.push({co: new RegExp("\\[\\["+elem.name+"\\]\\]","g"), na_co:result[0][elem.name]})
+            })
+            equalArrays(bracketArray,fields,()=>{
+                var n=0;
+                (function asyc(){
+                    if(n<=change_map.length-1){
+                        replace(html, change_map[n].co , change_map[n].na_co, (err, result) => {
+                            html = result;
+                            n++
+                            asyc()
+                        })   
+                    }
+                    else{
+                        callback(html)
+                    }
+                })()    
+            })
+        })
     })
 }
 
-function checkOpenBracket(letter,letter1,letter2){
-    return (letter==='[') ? true : false
-}
-function checkCloseBracket(letter){
-    return (letter===']') ? true : false
-}
-
-function getBrackets(query,callback){
-    parseData(query,(allBrackets,html)=>{
-        const withoutDuplicates = allBrackets.filter(function(el,i) {
-            return allBrackets.indexOf(el) == i;
-        });
-        callback(withoutDuplicates,html)
-    })
+function equalArrays(first,second,callback){
+    let errors = [];
+    for( const elem of first ){
+        let exist = false;
+        for( const elem2 of second ){
+            if(elem===elem2){exist=true}
+        } 
+        if(exist===false && elem.indexOf('.')===-1){errors.push(elem)}
+    }
+    if(errors.length!==0){throw new Error(`brak nastepujacych pol w zapytaniu ${errors.join(',')}`);}
+    else{callback()}
 }
 
-
-module.exports.getBrackets=getBrackets;
+module.exports.getDescription = getDescription;

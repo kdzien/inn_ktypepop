@@ -2,8 +2,7 @@
 var db = require("./db_connection")
 var Elem_auction_id = require("./config/item_id/ID.js")
 var Elem_title = require("./config/item_title/Title.js")
-var is = require("./config/jsonLoopPareser.js")
-var desc = require("./bracketParser/setMap.js")
+var sqlsolver = require("./sqlsolver.js")
 
 var single_item = {
     ItemID:"",
@@ -16,36 +15,37 @@ var single_item = {
 
 var item_array = new Array();
 
-const prod = 'owiewkiH';
+const prod = 'dywanyS';
 
 let db_query = `select * from konradd.ktype_widok_${prod}` ;
     console.log(db_query)
     
 db.query(db_query,function(err,result){
-    
     if(err){
         console.log(err)
     }
     var n = 0;
         (function asyc(){
         if(n<=result.length-1){
+            console.log(result[n].auction_id)
             let evq=`select * from konradd.ktype_widok_${prod} where profil_id=${result[n].profil_id} and zgodny_id=${result[n].zgodny_id} and produkt_id = ${result[n].produkt_id} and user_id='${result[n].user_id}' `
             let etq=`select content from ${getCorrectDBProduct(prod)} where user='${result[n].user_id}' and profil=${result[n].profil_id} and kind='xmld' and name =`
             var auction_id = new Elem_auction_id(result[n].auction_id)
             single_item.ItemID = auction_id.toString()
-                is.getItemDesc(etq+`'encoded_app_data'`,evq,isx=>{
+
+            sqlsolver.solve(etq+`'encoded_app_data'`,evq,isx=>{
+                
                 single_item.app_data = isx;
                 var title = new Elem_title(result[n].tytul)
                 single_item.item_title = title.toString()
-                is.getItemDesc(etq+`'ItemCompatibilityList_replace'`,evq,isx=>{
+                sqlsolver.solve(etq+`'ItemCompatibilityList_replace'`,evq,isx=>{
                     single_item.compability_list=isx;
-                    is.getItemDesc(etq+`'ItemSpecifics'`,evq,(isx)=>{
+                    sqlsolver.solve(etq+`'ItemSpecifics'`,evq,(isx)=>{
                         single_item.item_specific=isx
-                        is.getItemDesc('select html_template from '+getCorrectHTMLTEMPLATE(prod)+'.`db_config_'+result[n].user_id+'`'+' where profil_id = '+result[n].profil_id,evq,(rdesc)=>{
+                        sqlsolver.solve('select html_template from '+getCorrectHTMLTEMPLATE(prod)+'.`db_config_'+result[n].user_id+'`'+' where profil_id = '+result[n].profil_id,evq,(rdesc)=>{
                             single_item.item_desc=rdesc.replace(/(\r\n|\n|\r)/gm,"").replace(/'/g, "\\'");;
                             item_array.push(single_item)
                             single_item = {}
-                            console.log(result[n].auction_id)
                             n++
                             asyc()
                         })

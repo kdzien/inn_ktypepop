@@ -2,17 +2,6 @@ const mysql = require('mysql');
 const db_config = require("./db_config.js");
 let Loop = require("./class/Loop.js")
 
-
-// con.connect(function(err) {
-//  con.query("select html from konradd.loop_test",function(err,result){
-//      if(err){throw new Error(err)}
-//      else{
-//         var html = result[0].html;
-        
-//      }
-//  })
-// });
-
 function solve (html,con){
     return new Promise((resolve,reject)=>{
         (function asyc(){
