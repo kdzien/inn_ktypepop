@@ -17,9 +17,20 @@
   },
   "homepage": "https://github.com/kdzien/inn_ktypepop#readme",
   "dependencies": {
+    "browser-sync": "^2.23.6",
+    "express": "^4.16.3",
+    "gulp-nodemon": "^2.2.1",
+    "gulp-sass": "^3.2.1",
+    "gulp-sourcemaps": "^2.6.4",
     "jsontoxml": "^1.0.0",
+    "morgan": "^1.9.0",
     "mysql": "^2.15.0",
+    "path": "^0.12.7",
     "replace-async": "^1.1.1",
+    "request": "^2.85.0",
     "xml-js": "^1.6.2"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1"
   }
 }

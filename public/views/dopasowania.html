@@ -1,0 +1,18 @@
+<div class="container dopasowania">
+    <div class="col-md-4 logi">
+        <div class="panel-title">Dostępne logi</div>
+        <div class="col-md-12 log" ng-click="logPreview(log)" ng-repeat="log in logs | orderBy: '+log' ">
+            <div >{{log}} </div>
+        </div>
+    </div>
+    <div class="col-md-8 curentlog">
+        <div class="panel-title">Log {{currentlogDate}} </div>
+        <div class="col-md-12">
+            <div class="col-md-12" ng-model='currentLog' ui-codemirror >Tu wyswietlony bedzie log</div>
+            <div class="btn-group">
+                <div class="col-md-6 button" ng-click='runMatches($event)' ng-if="checkDate()!=logs[logs.length-1]">Sprawdz dopasowania</div>
+                <div class="col-md-6"></div>
+            </div>
+        </div>
+    </div>
+</div>

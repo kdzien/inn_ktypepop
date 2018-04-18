@@ -1,0 +1,51 @@
+@import 'mixins.scss';
+bodY{
+    background-color:whitesmoke;
+}
+.n-container{
+    .container-title{
+        @include custom-font(42,400,black);
+        text-align:center;
+    }
+    .nowosci-container{
+        margin:0 auto;
+        .nowosci-element{
+            position:relative;
+            background-color:white;
+            margin-bottom:10px;padding:10px;
+            &.add-new ,&.validate{
+                padding:15px;
+                background-color:hsl(84, 76%, 35%);
+                text-align:center;color:white;
+                &:hover{
+                    cursor:pointer;
+                    opacity:0.9;
+                }
+            }&.validate{
+                background-color:rgb(21, 75, 155);
+            }
+            i{
+                color: red;
+                position: absolute;
+                right: 0px;
+                font-size: 20px;
+                top: 0;
+                &:hover{
+                    cursor:pointer;
+                    opacity:0.5;
+                }
+            }
+            &.wrong-elem{
+                border:solid 1px red;
+            }
+            .validate-errors{
+                position: absolute;
+                right: 0px;
+                bottom: 0;
+                background-color: rgba(0,0,0,0.5);
+                padding: 10px;
+                color: white;
+            }
+        }
+    }
+}

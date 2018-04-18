@@ -1,3 +1,3 @@
-config/db_config.js
+controllers/config/db_config.js
 node_modules/
 package-lock.json

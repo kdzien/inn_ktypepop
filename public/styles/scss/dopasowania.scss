@@ -1,0 +1,31 @@
+@import 'mixins.scss';
+
+.dopasowania{
+    .logi{
+        .log{
+            text-align:center;
+            font-weight:500;
+            padding:10px;
+            &:hover{
+                background-color:rgba(0,0,0,0.1);
+                cursor:pointer;
+            }
+        }
+    }
+    .curentlog{
+        .btn-group{
+            width:100%;
+            padding:0px 15px;
+            .button{
+                padding:15px;
+                text-align:center;
+                color:white;
+                background-color:#5cb85c;
+                &:hover{
+                    cursor:pointer;
+                    opacity:0.9;
+                }
+            }
+        }
+    }
+}

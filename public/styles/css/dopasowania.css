@@ -1,0 +1,21 @@
+.dopasowania .logi .log {
+  text-align: center;
+  font-weight: 500;
+  padding: 10px; }
+  .dopasowania .logi .log:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    cursor: pointer; }
+
+.dopasowania .curentlog .btn-group {
+  width: 100%;
+  padding: 0px 15px; }
+  .dopasowania .curentlog .btn-group .button {
+    padding: 15px;
+    text-align: center;
+    color: white;
+    background-color: #5cb85c; }
+    .dopasowania .curentlog .btn-group .button:hover {
+      cursor: pointer;
+      opacity: 0.9; }
+
+/*# sourceMappingURL=maps/dopasowania.css.map */

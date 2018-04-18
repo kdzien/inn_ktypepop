@@ -1,0 +1,46 @@
+bodY {
+  background-color: whitesmoke; }
+
+.n-container .container-title {
+  font-size: 42;
+  font-weight: 400;
+  color: black;
+  text-align: center; }
+
+.n-container .nowosci-container {
+  margin: 0 auto; }
+  .n-container .nowosci-container .nowosci-element {
+    position: relative;
+    background-color: white;
+    margin-bottom: 10px;
+    padding: 10px; }
+    .n-container .nowosci-container .nowosci-element.add-new, .n-container .nowosci-container .nowosci-element.validate {
+      padding: 15px;
+      background-color: #679d15;
+      text-align: center;
+      color: white; }
+      .n-container .nowosci-container .nowosci-element.add-new:hover, .n-container .nowosci-container .nowosci-element.validate:hover {
+        cursor: pointer;
+        opacity: 0.9; }
+    .n-container .nowosci-container .nowosci-element.validate {
+      background-color: #154b9b; }
+    .n-container .nowosci-container .nowosci-element i {
+      color: red;
+      position: absolute;
+      right: 0px;
+      font-size: 20px;
+      top: 0; }
+      .n-container .nowosci-container .nowosci-element i:hover {
+        cursor: pointer;
+        opacity: 0.5; }
+    .n-container .nowosci-container .nowosci-element.wrong-elem {
+      border: solid 1px red; }
+    .n-container .nowosci-container .nowosci-element .validate-errors {
+      position: absolute;
+      right: 0px;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      color: white; }
+
+/*# sourceMappingURL=maps/nowosci.css.map */

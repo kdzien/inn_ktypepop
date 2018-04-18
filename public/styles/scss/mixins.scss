@@ -1,0 +1,14 @@
+@mixin middle-position(){
+    position:relative;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%)
+}
+@mixin custom-font($size,$weight:initial,$color:white){
+    font-size:$size;
+    font-weight:$weight;
+    color:$color
+}
+
+@mixin hover-active{
+    background-color:rgba(0,0,0,0.4) !important;
+}

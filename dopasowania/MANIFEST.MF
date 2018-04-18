@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Main-Class: xls_opener.Main
+
+Name: org/apache/xmlbeans/
+Comment: Apache XmlBeans version 2.6.0-r1364789
+Implementation-Title: org.apache.xmlbeans
+Implementation-Version: 2.6.0-r1364789
+Implementation-Vendor: Apache Software Foundation
+Implementation-URL: http://xmlbeans.apache.org/
+
+Name: org.apache.log4j
+DynamicImport-Package: *
+Implementation-Vendor: "Apache Software Foundation"
+Implementation-Title: log4j
+Implementation-Version: 1.2.17
+
