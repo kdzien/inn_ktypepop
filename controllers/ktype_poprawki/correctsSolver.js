@@ -1,5 +1,4 @@
 "use strict";
-var db = require("./db_connection")
 var Elem_auction_id = require("../config/item_id/ID.js")
 var Elem_title = require("../config/item_title/Title.js")
 var sqlsolver = require("./sqlsolver.js")
@@ -22,7 +21,7 @@ let db_query;
     
 // })
 
-function solver(prod,callback){
+function solver(prod,db){
     db_query=`select * from konradd.ktype_widok_${prod} `
     return new Promise((resolve,reject)=>{
         db.query(db_query,function(err,result){
@@ -41,16 +40,16 @@ function solver(prod,callback){
                 var auction_id = new Elem_auction_id(result[n].auction_id)
                 single_item.ItemID = auction_id.toString()
     
-                sqlsolver.solve(etq+`'encoded_app_data'`,evq,isx=>{
+                sqlsolver.solve(db,etq+`'encoded_app_data'`,evq,isx=>{
                     
                     single_item.app_data = isx;
                     var title = new Elem_title(result[n].tytul)
                     single_item.item_title = title.toString()
-                    sqlsolver.solve(etq+`'ItemCompatibilityList_replace'`,evq,isx=>{
+                    sqlsolver.solve(db,etq+`'ItemCompatibilityList_replace'`,evq,isx=>{
                         single_item.compability_list=isx;
-                        sqlsolver.solve(etq+`'ItemSpecifics'`,evq,(isx)=>{
+                        sqlsolver.solve(db,etq+`'ItemSpecifics'`,evq,(isx)=>{
                             single_item.item_specific=isx
-                            sqlsolver.solve('select html_template from '+getCorrectHTMLTEMPLATE(prod)+'.`db_config_'+result[n].user_id+'`'+' where profil_id = '+result[n].profil_id,evq,(rdesc)=>{
+                            sqlsolver.solve(db,'select html_template from '+getCorrectHTMLTEMPLATE(prod)+'.`db_config_'+result[n].user_id+'`'+' where profil_id = '+result[n].profil_id,evq,(rdesc)=>{
                                 single_item.item_desc=rdesc.replace(/(\r\n|\n|\r)/gm,"").replace(/'/g, "\\'");
                                 item_array.push(single_item)
                                 single_item = {}
@@ -67,7 +66,7 @@ function solver(prod,callback){
                     })
                 })
             }else{
-                postData(item_array,()=>{
+                postData(item_array,db,()=>{
                     resolve()
                 })
             }
@@ -153,7 +152,7 @@ function getCorectXML(user_id,profil_id,product){
     return `select content from ${db_name} where user='${user_id}' and profil=${profil_id} and kind='xmld' and name ='ItemSpecifics'`
 }   
 
-function postData(array,callback){
+function postData(array,db,callback){
     var n = 0;
     db.query("delete from konradd.ktype_test3",function(err,res){
         var sqlq = "insert into konradd.ktype_test3 (item_id,item_spec,item_comp,item_appdata,item_title,item_description,user_id) values ";

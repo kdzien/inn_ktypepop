@@ -1,5 +1,3 @@
-const mysql = require('mysql');
-const db_config = require("./db_config.js");
 let Loop = require("./class/Loop.js")
 
 function solve (html,con){

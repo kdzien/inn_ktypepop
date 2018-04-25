@@ -1,14 +1,25 @@
 var db = require("../config/db_config")
 var mysql = require('mysql');
 
-var connection = mysql.createConnection(db.config)
+var sqlStartConnection = function sqlStartConnection() {
+    return new Promise((resolve,reject)=>{
+        var connection = mysql.createConnection(db.config);
 
-connection.connect(function(err){
-    if(err){
-        console.log(err)
-    }
-    console.log("connected DB")
-})
+        connection.connect(function(err) {
+            if (err !== null) {
+                reject("[MYSQL] Error connecting to mysql:" + err+'\n');
+            }else{
+                resolve(connection)
+            }
+        });
+    })
+}
 
+var sqlEndConnection = function sqlEndConnection(connection,callback){
+        connection.end(()=>{
+            callback()
+        }); 
+}
 
-module.exports = connection;
+module.exports.sqlStartConnection = sqlStartConnection;
+module.exports.sqlEndConnection = sqlEndConnection;

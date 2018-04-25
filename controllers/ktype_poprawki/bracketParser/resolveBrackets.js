@@ -1,10 +1,9 @@
 
 "use strict";
-const db = require('../db_connection.js')
 
-function parseData(query,callback){
+function parseData(con,query,callback){
     const bracket_array = new Array();
-    db.query(query,function(err,result){
+    con.query(query,function(err,result){
         let html=''
         if(result.length===0){callback(bracket_array,"")}else{ html =  result[0].content || result[0].html_template || result[0].xml_template}
         var start=0,end=0;
@@ -31,8 +30,8 @@ function checkCloseBracket(letter){
     return (letter===']') ? true : false
 }
 
-function getBrackets(query,callback){
-    parseData(query,(allBrackets,html)=>{
+function getBrackets(con,query,callback){
+    parseData(con,query,(allBrackets,html)=>{
         const withoutDuplicates = allBrackets.filter(function(el,i) {
             return allBrackets.indexOf(el) == i;
         });

@@ -1,4 +1,4 @@
-function validateProduct(product,dbc){
+function validateProduct(product,con){
     return new Promise((resolve,reject)=>{
         let errors = [];
         console.log(product)
@@ -21,7 +21,7 @@ function validateProduct(product,dbc){
         if( doroku!=0 && (odroku<1900 || doroku>(new Date()).getFullYear())){
             errors.push(`do roku nie jest pomiędzy 1900 a ${(new Date()).getFullYear()}`)
         }
-        dbc.query(`select * from ee_owiewki_mateusz.produkty where kod_produkt='${sku}'`,function(err,result){
+        con.query(`select * from ee_owiewki_mateusz.produkty where kod_produkt='${sku}'`,function(err,result){
             if(err){reject(err)}
             else if (result.length!=0){
                 errors.push("Takie sku jest już w bazie, wez to posprzataj")
@@ -34,12 +34,12 @@ function validateProduct(product,dbc){
     })
 }
 
-function validateAll(array,dbc,callback){
+function validateAll(con,array,callback){
     let n = 0;
     let resultArray = [];
     (function async(){
         if(n<=array.length-1){
-            validateProduct(array[n],dbc).then((errors)=>{
+            validateProduct(array[n],con).then((errors)=>{
                 if(errors.length!=0){
                     resultArray.push({id:n,messages:errors})
                     n++;async()

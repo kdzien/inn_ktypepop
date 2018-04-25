@@ -1,8 +1,7 @@
-const dbc = require("../ktype_poprawki/db_connection.js")
 let Product = require("./class/Product.js")
 
 
-function addPZID(produkt){
+function addPZID(dbc,produkt){
     return new Promise((resolve,reject)=>{
         produkt.insertProdukty(dbc).then((pid)=>produkt.checkZgodny(dbc)
         .then((zid)=>{
@@ -30,7 +29,7 @@ function addPZID(produkt){
 
 
 
-function insertProducts(products){
+function insertProducts(dbc,products){
     return new Promise((resolve,reject)=>{
         let n = 0;
         (function solve(){
@@ -41,7 +40,7 @@ function insertProducts(products){
                 tpv.rokod==0 ? tpv.rokod=null : tpv.rokod;
                 tpv.ot=='tak' ? tpv.ot=true : tpv.ot=false;
                 let product= new Product(tpv.sku,tpv.marka,tpv.model,tpv.drzwi,tpv.rokod,tpv.rokdo,tpv.ot)
-                addPZID(product)
+                addPZID(dbc,product)
                 .then((produkt)=>produkt.insertKrosy(dbc)
                 .then(()=>produkt.insertProduktyLok(dbc)
                 .then(()=>{

@@ -1,12 +1,11 @@
 
 "use strict";
 const brackets = require('./resolveBrackets.js')
-const db = require('../db_connection.js')
 const replace = require('replace-async');
 
-function getDescription (view_query,template_query,callback,errorcallback){
-    brackets.getBrackets(template_query,(bracketArray,html)=>{
-        db.query(view_query,(err,result,fieldss)=>{
+function getDescription (view_query,template_query,con,callback,errorcallback){
+    brackets.getBrackets(con,template_query,(bracketArray,html)=>{
+        con.query(view_query,(err,result,fieldss)=>{
             let fields = [];
             let change_map = []
             fieldss.forEach(elem=>{

@@ -10,88 +10,145 @@ var newsController = require('./nowosci/newscontroller.js')
 var dopasowania = require('../dopasowania/index.js')
 var dopasowania_logi = require('./checkLogs')
 
-
-var con = mysql.createConnection({
-  multipleStatements: true,
-  host: "192.168.1.60",
-  user: "konradd",
-  password: "samba20",
-  port:"13306"
-});
-con.connect(err=>{
-
-})
+var db = require("./ktype_poprawki/db_connection.js")
 
 router.post('/corrects/:product',function(req,res){
-	correctsSolver.solver(req.params.product).then(()=>{
-    con.query("select * from konradd.ktype_test3",(err,response)=>{
-      res.json(response);
-   })
-  }).catch((err)=>{
+    db.sqlStartConnection().then(con=>{
+      correctsSolver.solver(req.params.product,con).then(()=>{
+        con.query(`select * from konradd.ktype_test3`,function(err,result){
+          if(err){
+            db.sqlEndConnection(con,()=>{
+              res.status(500).send(err)
+            })
+          }
+          db.sqlEndConnection(con,()=>{
+            res.json(result);
+          })
+        })
+      }).catch((err)=>{
+        db.sqlEndConnection(con,()=>{
+          res.status(500).send(err)
+        })
+      })
+    }).catch(err=>{
+      res.status(500).send(err)
+    })
+  
+})
+
+router.get('/templates',function(req,res){
+  db.sqlStartConnection().then(con=>{
+    con.query("select xml_template,sql_template from ebay_api_calls.turbodziobak_job_predefines where job_type='ReviseItem' and `name` = 'Poprawki ktype'",function(err,result){
+      if(err){
+        db.sqlEndConnection(con,()=>{
+          res.status(500).send(err)
+        })
+      }
+      db.sqlEndConnection(con,()=>{
+        res.json(result)
+      })  
+    })
+  }).catch(err=>{
     res.status(500).send(err)
   })
 })
-router.get('/templates',function(req,res){
-  con.query("select xml_template,sql_template from ebay_api_calls.turbodziobak_job_predefines where job_type='ReviseItem' and `name` = 'Poprawki ktype'",(err,response)=>{
-    res.json(response)
-  })
-})
+
 router.get('/xml_preview/:item_id',function(req,res){
   let vq = `select sql_template from ebay_api_calls.turbodziobak_job_predefines where job_type='ReviseItem' and name = 'Poprawki ktype'`
-  con.query(vq,function(err,result){
-    let view_query = result[0].sql_template
-    let template_query = `select xml_template from ebay_api_calls.turbodziobak_job_predefines where job_type='ReviseItem' and name = 'Poprawki ktype'`
-    bracketParser.getDescription(`${view_query} where b.auction_id = '${req.params.item_id}'`,template_query,(template)=>{
-      res.json(template)
+  db.sqlStartConnection().then(con=>{
+    con.query(vq,function(err,result){
+      if(err){
+        db.sqlEndConnection(con,()=>{
+          res.status(500).send(err)
+        })
+      }
+      let view_query = result[0].sql_template
+      let template_query = `select xml_template from ebay_api_calls.turbodziobak_job_predefines where job_type='ReviseItem' and name = 'Poprawki ktype'`
+      bracketParser.getDescription(`${view_query} where b.auction_id = '${req.params.item_id}'`,template_query,con,(template)=>{
+        db.sqlEndConnection(con,()=>{
+          res.json(template)
+        }) 
+      })
     })
+  }).catch(err=>{
+    res.status(500).send(err)
   })
 })
 
 router.post('/makejobs/:produkt',function(req,res){
-  con.query("select xml_template,sql_template from ebay_api_calls.turbodziobak_job_predefines where job_type='ReviseItem' and `name` = 'Poprawki ktype'",(err,response)=>{
-    let sendObj = {
-      data_to_proceed : `${response[0].sql_template}`, 
-      xml_template:response[0].xml_template, 
-      description : `Poprawki ${req.params.produkt}`,
-      jobname : 'ReviseItem'
-    }
-    var options = {
-      uri: 'http://192.168.1.60/turbodziobak_new/api/jobs/ebay/create',
-      method: 'POST',
-      headers: {
-        Authorization: `Basic a29ucmFkZDpzYW1iYTIw`,
-        Connection: 'keep-alive',
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-      },
-      form:sendObj
-    };
-    request(options,function(error,response,body){
-      if(error){throw new Error(error)}else{
-        res.json(body)
+  db.sqlStartConnection().then(con=>{
+    con.query("select xml_template,sql_template from ebay_api_calls.turbodziobak_job_predefines where job_type='ReviseItem' and `name` = 'Poprawki ktype'",function(err,response){
+      if(err){
+        db.sqlEndConnection(con,()=>{
+          res.status(500).send(err)
+        })
       }
+      db.sqlEndConnection(con,()=>{
+        let sendObj = {
+          data_to_proceed : `${response[0].sql_template}`, 
+          xml_template:response[0].xml_template, 
+          description : `Poprawki ${req.params.produkt}`,
+          jobname : 'ReviseItem'
+        }
+        var options = {
+          uri: 'http://192.168.1.60/turbodziobak_new/api/jobs/ebay/create',
+          method: 'POST',
+          headers: {
+            Authorization: `Basic a29ucmFkZDpzYW1iYTIw`,
+            Connection: 'keep-alive',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          },
+          form:sendObj
+        };
+        request(options,function(error,response,body){
+          if(error){throw new Error(error)}else{
+            res.json(body)
+          }
+        })
+      })  
     })
+  }).catch(err=>{
+    res.status(500).send(err)
   })
 })
 
 //nowosci
 router.post('/news/validate',function(req,res){
-  newsValidator.validateAll(req.body,con,function(result){
-    res.status(200).send(result)
+  db.sqlStartConnection().then(con=>{
+    newsValidator.validateAll(con,req.body,function(result){
+      db.sqlEndConnection(con,()=>{
+        res.status(200).send(result)
+      }) 
+    })
+  }).catch(err=>{
+    res.status(500).send(err)
   })
 })
+
 router.post('/news/add',function(req,res){
-  newsValidator.validateAll(req.body,con,function(errors){
-    if(errors.length==0){
-      newsController.insertProducts(req.body).then(()=>{
-        res.status(200).send("Poszly nowosci.")
-      }).catch(err=>{
-        console.log(err)
-        res.status(500).send(err)
-      })
-    }else{
-      res.status(500).send(errors)
-    }
+  db.sqlStartConnection().then(con=>{
+    newsValidator.validateAll(req.body,function(errors){
+      if(errors.length==0){
+        newsController.insertProducts(con,req.body).then(()=>{
+          db.sqlEndConnection(con,()=>{
+            res.status(200).send("Poszly nowosci.")
+          })
+        }).catch(err=>{
+          db.sqlEndConnection(con,()=>{
+            res.status(500).send(err)
+          })
+        })
+      }else{
+        db.sqlEndConnection(con,()=>{
+          res.status(500).send(errors)
+        })
+      }
+    })  
+  }).catch(err=>{
+    res.status(500).send(err)
   })
+  
+  
 })
 
 router.get('/dopasowania/',function(req,res){
