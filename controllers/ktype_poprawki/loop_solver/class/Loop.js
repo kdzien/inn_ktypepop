@@ -28,6 +28,7 @@ class Loop {
         let finalBody = ""
         con.connect(function(err){
             con.query(sql,(err,result,fieldss)=>{
+                if(err){console.log(sql)}
                 result.forEach((elemr,i)=>{
                     temp_map = []
                     fieldss.forEach(elemf=>{
@@ -38,7 +39,7 @@ class Loop {
                         }
                         
                     })
-                    change_map.push(temp_map);
+                    change_map.push(temp_map);  
                     temp_map=[]
                 })
                 var n =0;

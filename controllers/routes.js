@@ -179,4 +179,23 @@ router.post('/dopasowania/new',function(req,res){
   })
   res.status(202).send("Dopasowania uruchomione, sprawdzaj logi")
 })
+
+//zewnetrzne zasoby
+
+router.get('/photoproducer',function(req,res){
+  db.sqlStartConnection().then(con=>{
+    con.query(`select 
+    concat(produkt_id,'_',zgodny_id) as photo_name,
+    if(nr_zdjecia is null,'',concat('_',nr_zdjecia)) as photo_nr
+     from ee_owiewki_mateusz.photo_producer where source='rosja' order by produkt_id,zgodny_id,nr_zdjecia`,function(err,result){
+      if(err){res.status(500).send(err)}else{
+        res.send(result)
+      }
+    })
+  }).catch(err=>{
+    res.status(500).send(err)
+  })
+
+})
+
 module.exports = router;
