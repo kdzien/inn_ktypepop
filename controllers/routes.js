@@ -9,13 +9,25 @@ var newsValidator = require('./nowosci/validator.js')
 var newsController = require('./nowosci/newscontroller.js')
 var dopasowania = require('../dopasowania/index.js')
 var dopasowania_logi = require('./checkLogs')
-
+var memes = require('dankmemes');
 var db = require("./ktype_poprawki/db_connection.js")
 
-router.post('/corrects/:product',function(req,res){
-    db.sqlStartConnection().then(con=>{
-      correctsSolver.solver(req.params.product,con).then(()=>{
-        con.query(`select * from konradd.ktype_test3`,function(err,result){
+router.get('/randomMeme', function(req,res){
+  memes('hour', 20, function(err, data) {
+      if(err){
+        res.status(500).send(err)
+      }else{
+        let memnr = Math.floor((Math.random() * 20) + 1);
+        res.json(data[memnr].replace('https://i.redditmedia.com/',''));
+      }
+  });
+})
+
+router.get('/corrects/:type/:product/:xml_p',function(req,res){
+  let xml_p = req.params.xml_p;
+  db.sqlStartConnection().then(con=>{
+      correctsSolver.solver(req.params.type, req.params.product,xml_p,con).then(()=>{
+        con.query(`select * from konradd.poprawki_ktype`,function(err,result){
           if(err){
             db.sqlEndConnection(con,()=>{
               res.status(500).send(err)
@@ -33,7 +45,6 @@ router.post('/corrects/:product',function(req,res){
     }).catch(err=>{
       res.status(500).send(err)
     })
-  
 })
 
 router.get('/templates',function(req,res){
@@ -66,7 +77,8 @@ router.get('/xml_preview/:item_id',function(req,res){
       let template_query = `select xml_template from ebay_api_calls.turbodziobak_job_predefines where job_type='ReviseItem' and name = 'Poprawki ktype'`
       bracketParser.getDescription(`${view_query} where b.auction_id = '${req.params.item_id}'`,template_query,con,(template)=>{
         db.sqlEndConnection(con,()=>{
-          res.json(template)
+          const html_t = template.substring(template.indexOf('<Description>')+13,template.indexOf('</Description>'))
+          res.json({xml:template, html: html_t})
         }) 
       })
     })
@@ -184,15 +196,18 @@ router.post('/dopasowania/new',function(req,res){
 
 router.get('/photoproducer',function(req,res){
   db.sqlStartConnection().then(con=>{
-    con.query(`select 
-    concat(produkt_id,'_',zgodny_id) as photo_name,
-    if(nr_zdjecia is null,'',concat('_',nr_zdjecia)) as photo_nr
-     from ee_owiewki_mateusz.photo_producer where source='rosja' order by produkt_id,zgodny_id,nr_zdjecia`,function(err,result){
+    con.query(`select x.sku,concat(x.produkt_id,'_',x.zgodny_id,if(k.nr_zdjecia is null,'',concat('_',k.nr_zdjecia))) as nazwa, k.source as froms from konradd.photo_producer_bp k inner join (
+      select k.produkt_id,k.zgodny_id,concat('H',k.art_id,'00') as sku from ee_owiewki_mateusz.aukcja_view k inner join (
+      select produkt_id,zgodny_id from konradd.photo_producer_bp where source='rosja' group by produkt_id,zgodny_id) x
+      on k.produkt_id=x.produkt_id and k.zgodny_id=x.zgodny_id  group by k.produkt_id,k.zgodny_id
+      ) x on k.produkt_id=x.produkt_id and k.zgodny_id=x.zgodny_id where k.source like '%rosja%' order by k.produkt_id,k.zgodny_id`,function(err,result){
       if(err){res.status(500).send(err)}else{
         res.send(result)
       }
     })
+
   }).catch(err=>{
+    console.log(err)
     res.status(500).send(err)
   })
 

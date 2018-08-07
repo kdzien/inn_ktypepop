@@ -1,37 +1,58 @@
 <div id="waiting-modal">
-    <div id="waiting-circle">{{message}}</div>
+    <div id="waiting-circle">
+        <div>{{message}}</div>
+        <button id="waiting-button" ng-click="hideMessage()">OK</button>
+    </div>
 </div>
 <main class="container-fluid">
     <div id="user-chooser">
-        <div id="user-panel">
+        <div id="user-panel" >
+            <div class="panel-title">
+                Rzeczy do poprawy
+            </div>
+            <select multiple ng-model="correctThings">
+                <option value="encoded_app_data">encoded_app_data</option>
+                <option value="ItemCompatibilityList_replace">ItemCompatibilityList_replace</option>
+                <option value="ItemSpecifics">ItemSpecifics</option>
+                <option value="Description">Description</option>
+                <option value="Title">Title</option>
+                <option value="PictureDetails">PictureDetails</option>
+            </select>
+            
+        </div>
+        <div id="user-panel" >
+            <div class="panel-title">
+                Jaka poprawka
+            </div>
+            <input style="width:100%;color:black" ng-model="ktype_type" />
+            
+        </div>
+        <div id="user-panel" >
             <div class="panel-title">
                 Wybierz produkt
             </div>
-            <div class="col-md-2 user" ng-repeat="user in users" ng-click="chooseUser(user)" ng-class="{'active' : currentUser==user, 'last-generated': currentUserToSend==user}">
+            <div class="user" ng-repeat="user in users" ng-click="chooseUser(user)" ng-class="{'active' : currentUser==user, 'last-generated': currentUserToSend==user}">
                 {{user.title}}
             </div>
         </div>
+        
         <div class="button-group">
                 <button class="btn btn-success" ng-click="generateCorrects()">Generuj</button>
                 <button class="btn btn-info " ng-if="corrects.length>0" ng-click="sendToDziobak()">Wyslij joby</button>
         </div>
     </div>
-    <!-- <div class="row">
-        <div class="col-md-3">
-                XML
-                <div ui-codemirror ng-model="xmltemplate"></div>
-        </div>
-        <div class="col-md-3">
-                SQL
-                <div ui-codemirror ng-model="sqltemplate"></div>
-        </div>
-    </div> -->
-    <div class="row" ng-if="corrects.length==0" id="nocorrects">
+
+    <div ng-if="corrects.length==0" id="nocorrects">
         <div class="col-md-12">
             Nie ma aktualnie poprawek dla tego produktu
         </div>
     </div>
-    <div class="row main-content" ng-if="corrects.length>0">
+    <div class="main-content" ng-if="(!corrects.length)">
+        <div class="col-md-12">
+            <img style="display:block; margin:0 auto; max-width:60%;" ng-src="https://i.redditmedia.com/{{randomMeme}}" />
+        </div>
+    </div>
+    <div class=" main-content" ng-if="corrects.length>0">
         <div class="col-md-4" id="corrects" >
             <table class="table" >
                 <thead>
@@ -43,14 +64,14 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="correct in corrects"  ng-click='chooseCorrect(correct,$index);openPreview()'  ng-class="{active: $index == selected}">
-                        <td><a ng-href="https://ebay.de/itm/{{getLink(correct)}}" target="_blank"><span class="glyphicon glyphicon-new-window"></span></a></td>
-                        <td>{{getLink(correct)}}</td>
+                        <td><a ng-href="https://ebay.de/itm/{{correct.ItemID}}" target="_blank"><span class="glyphicon glyphicon-new-window"></span></a></td>
+                        <td>{{correct.ItemID}}</td>
                         <td>{{correct.user_id}}</td>
                     </tr>
                 </tbody>
                 </table>
         </div>
-    <div class="col-md-8">
+        <div class="col-md-8">
             <form ng-init='showHTML=true;'>
                     <span>
                     <input ng-click="showHTML=true;showXML=false" id="Radio1" name="template" type="radio" value="Option 1" checked="checked">
@@ -64,8 +85,8 @@
             </form>
             <div id="correctsCount">Ilość poprawek wygenerowanych: {{corrects.length}}</div>
             <div ng-if="corrects">
-                <iframe ng-if="showHTML" srcdoc="{{choosedCorrect.item_description | toTrusted }}"></iframe>
-                <div style="height:100%" ng-if="showXML" ui-codemirror ng-model="xml_preview"></div>
+                <iframe ng-if="showHTML" srcdoc="{{choosedCorrect | toTrusted }}"></iframe>
+                <textarea  id="xml-frame" ng-if="showXML" ui-codemirror role="presentation" ng-model="xml_preview"></textarea >
             </div>
         </div>
     </div>

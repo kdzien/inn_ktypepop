@@ -3,68 +3,97 @@ var Elem_auction_id = require("../config/item_id/ID.js")
 var Elem_title = require("../config/item_title/Title.js")
 var sqlsolver = require("./sqlsolver.js")
 
-var single_item = {
-    ItemID:"",
-    app_data:"",
-    compability_list:"",
-    item_specific:"",
-    item_title:"",
-    item_desc:"",
-    user_id:""
-}
 
 var item_array = new Array();
 
 const prod = '';
 let db_query;
-// solver(prod,()=>{
-    
-// })
 
-function solver(prod,db){
+function solver(type,prod,xml_p,db){
+    let xml_positions = xml_p.substring(1, xml_p.length-1).split(",");
+    console.log(xml_positions)
     db_query=`select * from konradd.ktype_widok_${prod} `
+    if(type!='undefined' && type.length!=0){
+        db_query = db_query+ ` where cozapoprawka = '${type}'`
+    }
+    db_query = db_query + ' group by auction_id'
+    console.log(db_query)
+    console.log(db_query)
     return new Promise((resolve,reject)=>{
         db.query(db_query,function(err,result){
             if(err){
+                console.log(err)
                 reject("problem z bazą")
+                clearItems()
             }
             else{
-            var n = 0;
+            let n = 0;
+            console.log(result.length);
             (function asyc(){
-                console.log(n)
             if(n<=result.length-1){
-                console.log(result[n].user_id)
                 let evq=`select * from konradd.ktype_widok_${prod} where profil_id=${result[n].profil_id} and zgodny_id=${result[n].zgodny_id} and produkt_id = ${result[n].produkt_id} and user_id='${result[n].user_id}' `
+
                 let etq=`select content from ${getCorrectDBProduct(prod)} where user='${result[n].user_id}' and profil=${result[n].profil_id} and kind='xmld' and name =`
-                single_item.user_id=result[n].user_id
-                var auction_id = new Elem_auction_id(result[n].auction_id)
-                single_item.ItemID = auction_id.toString()
-    
-                sqlsolver.solve(db,etq+`'encoded_app_data'`,evq,isx=>{
-                    
-                    single_item.app_data = isx;
-                    var title = new Elem_title(result[n].tytul)
-                    single_item.item_title = title.toString()
-                    sqlsolver.solve(db,etq+`'ItemCompatibilityList_replace'`,evq,isx=>{
-                        single_item.compability_list=isx;
-                        sqlsolver.solve(db,etq+`'ItemSpecifics'`,evq,(isx)=>{
-                            single_item.item_specific=isx
+                let single_item = {
+                    ItemID:"",
+                    xml:"",
+                    user_id:""
+                }
+                single_item.ItemID=result[n].auction_id;
+                single_item.user_id=result[n].user_id;
+                
+                let j = 0;
+                (function async2(){
+                    if(j<=xml_positions.length-1){
+                        if(xml_positions[j]=='Description'){
                             sqlsolver.solve(db,'select html_template from '+getCorrectHTMLTEMPLATE(prod)+'.`db_config_'+result[n].user_id+'`'+' where profil_id = '+result[n].profil_id,evq,(rdesc)=>{
-                                single_item.item_desc=rdesc.replace(/(\r\n|\n|\r)/gm,"").replace(/'/g, "\\'");
-                                item_array.push(single_item)
-                                single_item = {}
-                                n++
-                                asyc()
+                                single_item.xml +=`<Description><![CDATA[[[${rdesc.replace(/(\r\n|\n|\r)/gm,"").replace(/'/g, "\\'")}]]]]></Description>`
+                                j++;async2();
                             },(error)=>{
                                 reject(`${result[n].user_id}_${result[n].country}: ${error}`)
+                                clearItems()
                             })
-                        },(error)=>{
-                            reject(`${result[n].user_id}_${result[n].country}: ${error}`)
-                        })
-                    },(error)=>{
-                        reject(`${result[n].user_id}_${result[n].country}: ${error}`)
-                    })
-                })
+                        }else{
+                            sqlsolver.solve(db,etq+`'${xml_positions[j]}'`,evq,isx=>{
+                                single_item.xml +=isx.replace(/'/g, "\\'");  ;
+                                j++;async2();
+                            },(error)=>{
+                                reject(`${result[n].user_id}_${result[n].country}: ${error}`)
+                                clearItems()
+                            })
+                        }
+                        
+                    }else{
+                        item_array.push(single_item)
+                        n++;asyc();
+                    }
+                })()
+    
+                // sqlsolver.solve(db,etq+`'encoded_app_data'`,evq,isx=>{
+                    
+                //     single_item.app_data = isx;
+                //     var title = new Elem_title(result[n].tytul)
+                //     single_item.item_title = title.toString()
+                //     sqlsolver.solve(db,etq+`'ItemCompatibilityList_replace'`,evq,isx=>{
+                //         single_item.compability_list=isx;
+                //         sqlsolver.solve(db,etq+`'ItemSpecifics'`,evq,(isx)=>{
+                //             single_item.item_specific=isx
+                //             sqlsolver.solve(db,'select html_template from '+getCorrectHTMLTEMPLATE(prod)+'.`db_config_'+result[n].user_id+'`'+' where profil_id = '+result[n].profil_id,evq,(rdesc)=>{
+                //                 single_item.item_desc=rdesc.replace(/(\r\n|\n|\r)/gm,"").replace(/'/g, "\\'");
+                //                 item_array.push(single_item)
+                //                 single_item = {}
+                //                 n++
+                //                 asyc()
+                //             },(error)=>{
+                //                 reject(`${result[n].user_id}_${result[n].country}: ${error}`)
+                //             })
+                //         },(error)=>{
+                //             reject(`${result[n].user_id}_${result[n].country}: ${error}`)
+                //         })
+                //     },(error)=>{
+                //         reject(`${result[n].user_id}_${result[n].country}: ${error}`)
+                //     })
+                // })
             }else{
                 postData(item_array,db,()=>{
                     resolve()
@@ -154,16 +183,15 @@ function getCorectXML(user_id,profil_id,product){
 
 function postData(array,db,callback){
     var n = 0;
-    db.query("delete from konradd.ktype_test3",function(err,res){
-        var sqlq = "insert into konradd.ktype_test3 (item_id,item_spec,item_comp,item_appdata,item_title,item_description,user_id) values ";
+    db.query("delete from konradd.poprawki_ktype",function(err,res){
+        var sqlq = "insert into konradd.poprawki_ktype (ItemID,xml,user_id) values ";
         var valuesx = "";
     
-        (function asyc2(){
+        (function asyc3(){
             if(n<=array.length-1){
-                valuesx+=`("${array[n].ItemID}","${array[n].item_specific}","${array[n].compability_list}","${array[n].app_data}","${array[n].item_title}",'${array[n].item_desc}','${array[n].user_id}'), `
-
+                valuesx+=`('${array[n].ItemID}','${array[n].xml}','${array[n].user_id}'), `
                 n++
-                asyc2()
+                asyc3()
             }else{
                 valuesx = valuesx.slice(0,-2)
                 sqlq = sqlq+valuesx
@@ -174,14 +202,16 @@ function postData(array,db,callback){
                 db.query(sqlq,function(err,result){
                     if(err){throw new Error(err)}
                     else{
-                        console.log("koniec")
-                        item_array=[];
+                        clearItems();
                         callback()
                     }
                 })
             }
         })()
     })
+}
+function clearItems(){
+    item_array= [];
 }
 
 module.exports.solver=solver;

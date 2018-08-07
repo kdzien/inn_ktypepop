@@ -19,6 +19,7 @@
   "dependencies": {
     "browser-sync": "^2.23.6",
     "cors": "^2.8.4",
+    "dankmemes": "^1.0.0",
     "express": "^4.16.3",
     "gulp-nodemon": "^2.2.1",
     "gulp-sass": "^3.2.1",

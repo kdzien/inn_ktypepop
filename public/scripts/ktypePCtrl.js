@@ -2,9 +2,19 @@ angular.module('myApp').controller('ktypePCtrl', [
 '$scope','$http','$timeout','$document',
 function($scope,$http,$timeout,$document){
 
+	$scope.randomMeme;
+	$http.get(`/api/randomMeme`, ).then(function (success){
+		if(!$scope.randomMeme){
+			$scope.randomMeme = success.data.toString();
+		}
+	},function (error){
+		console.log(error)
+	});
 	var waitingmodal = document.getElementById("waiting-modal")
+	var waitingbutton = document.getElementById("waiting-button");
 	$scope.xmltemplate='';
 	$scope.sqltemplate=''
+	$scope.ktype_type='';
 	$scope.currentUser
 	$scope.currentUserToSend=''
 	$scope.message=''
@@ -26,6 +36,8 @@ function($scope,$http,$timeout,$document){
 	},error=>{
 
 	})
+	
+	
 
 	$scope.chooseUser = function(user){
 		$scope.currentUser=user;
@@ -53,33 +65,43 @@ function($scope,$http,$timeout,$document){
 		}
 		waitingmodal.style.display = "block";
 		$scope.message="Trwa generowanie"
-		$http.post(`/api/corrects/${$scope.currentUser.dbtitle}`).then(function (success){
-			waitingmodal.style.display = "none";
-			$scope.corrects=success.data
-		},function (error){
-			waitingmodal.style.display = "none";
-			showMessage(error.data,10000)
-		});
+		if($scope.ktype_type.length==0){
+				$scope.ktype_type='undefined'
+		}
+		if(!$scope.correctThings){
+			showMessage("Nie wybrałeś rzeczy do poprawy")
+		}else{
+			waitingbutton.style.display="none";
+			$http.get(`/api/corrects/${$scope.ktype_type}/${$scope.currentUser.dbtitle}/'${$scope.correctThings.join(",")}'`, ).then(function (success){
+				waitingmodal.style.display = "none";
+				$scope.corrects=success.data
+				$scope.ktype_type=''
+				waitingbutton.style.display="block";
+			},function (error){
+				waitingmodal.style.display = "none";
+				waitingbutton.style.display="block";
+				showMessage(error.data,10000)
+			});
+		}
+		
 	}
 	$scope.chooseCorrect = function(correct,index){
 		$scope.selected = index; 
-		$http.get(`/api/xml_preview/${$scope.getLink(correct)}`).then(success=>{
-			$scope.xml_preview=success.data
+		$http.get(`/api/xml_preview/${correct.ItemID}`).then(success=>{
+			$scope.xml_preview=success.data.xml
+			$scope.choosedCorrect = success.data.html;
+			console.log($scope.choosedCorrect)
 		},error=>{
-
+			console.log(error)
 		})
-		$scope.choosedCorrect = correct;
-		
-	}
-	$scope.getLink = function(correct){
-		let link = correct.item_id.replace('<ItemID>','').replace('</ItemID>','')
-		return link
 	}
 	$scope.sendToDziobak = function(){
 		$scope.message = "Wysyłanie..."
+		waitingbutton.style.display = "none";
 		waitingmodal.style.display = "block";
 		$http.post(`/api/makejobs/${$scope.currentUserToSend.title}`).then(function (success){
 			showMessage("Sprawdź dziobaka")
+			waitingbutton.style.display = "block";
 		},function (error){
 
 		});
@@ -88,8 +110,9 @@ function($scope,$http,$timeout,$document){
 	function showMessage(message,delay = 3000){
 		$scope.message=message
 		waitingmodal.style.display = "block";
-		$timeout( function(){
-			waitingmodal.style.display = "none";
-        }, delay );
+	}
+	$scope.hideMessage = function(){
+		waitingmodal.style.display = "none";
+		$scope.message="";
 	}
 }]);

@@ -5,6 +5,7 @@ const replace = require('replace-async');
 
 function getDescription (view_query,template_query,con,callback,errorcallback){
     brackets.getBrackets(con,template_query,(bracketArray,html)=>{
+        console.log(view_query)
         con.query(view_query,(err,result,fieldss)=>{
             let fields = [];
             let change_map = []

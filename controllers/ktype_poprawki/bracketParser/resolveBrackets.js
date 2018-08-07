@@ -4,7 +4,10 @@
 function parseData(con,query,callback){
     const bracket_array = new Array();
     con.query(query,function(err,result){
-        let html=''
+        if(err){
+            throw new Error(err)
+        }else{
+            let html=''
         if(result.length===0){callback(bracket_array,"")}else{ html =  result[0].content || result[0].html_template || result[0].xml_template}
         var start=0,end=0;
         for(let x =0; x<=html.length-1;x++){
@@ -19,6 +22,7 @@ function parseData(con,query,callback){
             else if(html.length-1===x){
                 callback(bracket_array,html)
             }
+        }
         }
     })
 }

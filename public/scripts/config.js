@@ -18,4 +18,9 @@ angular.module('myApp').config(['$stateProvider', '$urlRouterProvider',
                 templateUrl: "../views/dopasowania.html",
                 controller: "dopasowaniaCtrl"
             })
+            .state('ruskie', {
+                url: "/ruskie",
+                templateUrl: "../views/ruskie_foto.html",
+                controller: "ruskieCtrl"
+            })
 }]);
