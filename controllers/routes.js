@@ -196,11 +196,21 @@ router.post('/dopasowania/new',function(req,res){
 
 router.get('/photoproducer',function(req,res){
   db.sqlStartConnection().then(con=>{
-    con.query(`select x.sku,concat(x.produkt_id,'_',x.zgodny_id,if(k.nr_zdjecia is null,'',concat('_',k.nr_zdjecia))) as nazwa, k.source as froms from konradd.photo_producer_bp k inner join (
-      select k.produkt_id,k.zgodny_id,concat('H',k.art_id,'00') as sku from ee_owiewki_mateusz.aukcja_view k inner join (
-      select produkt_id,zgodny_id from konradd.photo_producer_bp where source='rosja' group by produkt_id,zgodny_id) x
-      on k.produkt_id=x.produkt_id and k.zgodny_id=x.zgodny_id  group by k.produkt_id,k.zgodny_id
-      ) x on k.produkt_id=x.produkt_id and k.zgodny_id=x.zgodny_id where k.source like '%rosja%' order by k.produkt_id,k.zgodny_id`,function(err,result){
+    con.query(`
+    select * from ( 
+      select x.sku,concat(x.produkt_id,'_',x.zgodny_id,if(k.nr_zdjecia is null,'',concat('_',k.nr_zdjecia))) as nazwa, k.source as froms from ee_owiewki_mateusz.photo_producer k inner join (
+            select k.produkt_id,k.zgodny_id,concat('H',k.art_id,'00') as sku from ee_owiewki_mateusz.aukcja_view k inner join (
+            select produkt_id,zgodny_id from ee_owiewki_mateusz.photo_producer where source='rosja' group by produkt_id,zgodny_id) x
+            on k.produkt_id=x.produkt_id and k.zgodny_id=x.zgodny_id  group by k.produkt_id,k.zgodny_id
+            ) x on k.produkt_id=x.produkt_id and k.zgodny_id=x.zgodny_id where k.source like '%rosja%' order by k.produkt_id,k.zgodny_id
+      ) x where x.nazwa not in (
+      select concat(x.produkt_id,'_',x.zgodny_id,if(k.nr_zdjecia is null,'',concat('_',k.nr_zdjecia))) as nazwa from konradd.photo_producer_bp k inner join (
+            select k.produkt_id,k.zgodny_id,concat('H',k.art_id,'00') as sku from ee_owiewki_mateusz.aukcja_view k inner join (
+            select produkt_id,zgodny_id from konradd.photo_producer_bp where source='rosja' group by produkt_id,zgodny_id) x
+            on k.produkt_id=x.produkt_id and k.zgodny_id=x.zgodny_id  group by k.produkt_id,k.zgodny_id
+            ) x on k.produkt_id=x.produkt_id and k.zgodny_id=x.zgodny_id where k.source like '%rosja%' order by k.produkt_id,k.zgodny_id
+      )
+    `,function(err,result){
       if(err){res.status(500).send(err)}else{
         res.send(result)
       }

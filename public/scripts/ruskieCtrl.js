@@ -11,6 +11,8 @@ angular.module('myApp').controller('ruskieCtrl', [
         })
         $scope.checkh = function(elem){
             $scope.temparr.push(elem.sku)
+        }
+        $scope.showWrongs = function(){
             console.log($scope.temparr)
         }
     }]);

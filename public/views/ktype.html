@@ -47,11 +47,7 @@
             Nie ma aktualnie poprawek dla tego produktu
         </div>
     </div>
-    <div class="main-content" ng-if="(!corrects.length)">
-        <div class="col-md-12">
-            <img style="display:block; margin:0 auto; max-width:60%;" ng-src="https://i.redditmedia.com/{{randomMeme}}" />
-        </div>
-    </div>
+
     <div class=" main-content" ng-if="corrects.length>0">
         <div class="col-md-4" id="corrects" >
             <table class="table" >
@@ -86,7 +82,7 @@
             <div id="correctsCount">Ilość poprawek wygenerowanych: {{corrects.length}}</div>
             <div ng-if="corrects">
                 <iframe ng-if="showHTML" srcdoc="{{choosedCorrect | toTrusted }}"></iframe>
-                <textarea  id="xml-frame" ng-if="showXML" ui-codemirror role="presentation" ng-model="xml_preview"></textarea >
+                <div  id="xml-frame" ng-if="showXML" ui-codemirror role="presentation" ng-model="xml_preview"></div >
             </div>
         </div>
     </div>

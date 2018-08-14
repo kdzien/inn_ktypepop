@@ -1,12 +1,10 @@
-
- 
-
     <div ng-repeat="(key, value) in zdjecia | groupBy: 'sku' | limitTo:10">
+        <button ng-click='showWrongs() 'style="position:fixed;top:0;right:0;">Pokaz bledne</button>
         <div style="text-align:center;background-color:greenyellow">sku: {{ key }}</div>
         <div style="display:inline-block" ng-repeat="zd in value ">
             <div style="display:table-caption">
                 {{zd.froms}}
-                <img ng-click="checkh(zd)" src="./images/input/{{zd.nazwa}}.jpg" style="width:200px;height:100px" />
+                <img ng-click="checkh(zd)" src="https://photo.eternalcar.com/en/H_Windabweiser/gallery/producer/{{zd.nazwa}}.png" style="width:200px;height:100px" />
             </div>
             
         </div>

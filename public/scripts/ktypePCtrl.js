@@ -2,14 +2,8 @@ angular.module('myApp').controller('ktypePCtrl', [
 '$scope','$http','$timeout','$document',
 function($scope,$http,$timeout,$document){
 
-	$scope.randomMeme;
-	$http.get(`/api/randomMeme`, ).then(function (success){
-		if(!$scope.randomMeme){
-			$scope.randomMeme = success.data.toString();
-		}
-	},function (error){
-		console.log(error)
-	});
+	$scope.randomMeme ='';
+
 	var waitingmodal = document.getElementById("waiting-modal")
 	var waitingbutton = document.getElementById("waiting-button");
 	$scope.xmltemplate='';
